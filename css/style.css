@@ -334,7 +334,7 @@ img{
  }
  /*scroll*/
 
-  .scroll-up{
+  /* .scroll-up{
     position: fixed;
     right: 50px;
     bottom: 50px;
@@ -377,7 +377,7 @@ img{
     stroke: rgb(18, 148, 235);
     stroke-width: 4px;
     transition: .2s all linear;
-  }
+  } */
   .content-doc-img{
     cursor: pointer;
   }
