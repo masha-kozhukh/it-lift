@@ -49,7 +49,13 @@ const navSider = ()=>{
             if (link.style.animation){
                 link.style.animation = ''
             }else{
-                link.style.animation = `navLinkFade 0.5s ease forwards ${index / 7 + 0.3}s`;
+                if (window.innerWidth < 950 ){
+                    link.style.animation = `navLinkFade 0.5s ease forwards ${index / 7 + 0.3}s`;
+                    link.addEventListener('click' , ()=>{
+                      nav.classList.remove('header-active');
+                      burger.classList.remove('toggle');
+                    });
+                }
             }
            
        
@@ -61,94 +67,98 @@ const navSider = ()=>{
 }
 navSider();
 
-//form
-document.addEventListener('DOMContentLoaded', function(){
-    const form = document.getElementById('form');
-    form.addEventListener('submit', formSend);
+    //scroll to top
+        const offset = 100; 
+        const scrollUP = document.querySelector(".scroll-up");
+        const scrollUpSvgPath = document.querySelector('.scroll-up__svg-path');
+        const pathLength = scrollUpSvgPath.getTotalLength();
 
-    async function formSend(e){
-        e.preventDefault();
-        let error = formValidate(form);
-        
-        if (error === 0){
-            form.classList.add('_sending');
-            // let response = await fetch ('sendmail.php',{
-            //     method:'POSR',
-            // });
-            // if(response.ok){
-            //     let result = await response.json();
-            //     alert(result.message);
-            //     formPreview.innerHTML = '';
-            //     form.reset();
-            // form.classList.remove('_sending');
-            // }else{
-            //     alert('error');
-            //form.classList.remove('_sending');
-            // }
+        scrollUpSvgPath.style.strokeDasharray=`${pathLength} ${pathLength}`;
+        scrollUpSvgPath.style.transition='stroke-dashoffset 20ms';
 
+        const getTop = () => window.pageYOffset || document.documentElement.scrollTop;
 
+        //updateDashoffset
+        const updateDashoffset =()=>{
+            const height = document.documentElement.scrollHeight - window.innerHeight;
+            const dashoffset = pathLength -( getTop() * pathLength / height);
 
-        }else{
-            alert ('you missed something');
-        }
-      
+            scrollUpSvgPath.style.strokeDashoffset = dashoffset;
+        };
 
-    }
+        // onScroll
 
-    function formValidate(form){
-        let error = 0;
-        let formReq = document.querySelectorAll('._req');
-
-        for (let index = 0; index<formReq.length; index++){
-            const input = formReq[index];
-
-            formRemoveError(input);
-            
-            if(input.classList.contains('_email')){
-                if (emailTest(input)){
-                    formAddError(input);
-                    error++;
-                }
-            }
-            if(input.classList.contains('_numb')){
-                if (numbTest(input)){
-                    formAddError(input);
-                    error++;
-                }
+        window.addEventListener("scroll" , () => {
+            updateDashoffset();
+            if(getTop() > offset){
+                scrollUP.classList.add('scroll-up--active')
             }else{
-                if (input.value === ''){
-                    formAddError(input);
-                    error++;
-                }
+                scrollUP.classList.remove('scroll-up--active')
             }
-           
-            
-            
+        });
 
+        //click
+        scrollUP.addEventListener("click" , ()=>{
+            window.scrollTo({
+                top:0,
+                behavior:'smooth'
+            })
+        });
+
+        //input phone
+
+        let selector = document.querySelectorAll('input[type="tel"]');
+
+        let im = new Inputmask("+38 (099)999-99-99");
+
+
+           //validate form
+          im.mask(selector);
+
+        let selector2 = document.querySelector('input[type="tel"]');
+
+        // selector2.addEventListener('input', function(){
+        //   console.log(selector2.value)
+
+
+        //   const re = /^\d*(\.\d+)?$/
+
+        //   console.log(selector2.value.match(/[0-9]/g).length)
+
+
+        //   console.log(selector2.value.replace(/[0-9]/g, "0"));
+          
+        // });
+
+        
+       
+
+        let validateForms = function(selector, rules, successModal, yaGoal) {
+          new window.JustValidate(selector, {
+            rules: rules,
+            // submitHandler: function(form) {
+            //   let formData = new FormData(form);
+
+            //   let xhr = new XMLHttpRequest();
+
+            //   xhr.onreadystatechange = function() {
+            //     if (xhr.readyState === 4) {
+            //       if (xhr.status === 200) {
+            //         console.log('Отправлено');
+            //       }
+            //     }
+            //   }
+
+            //   xhr.open('POST', 'mail.php', true);
+            //   xhr.send(formData);
+
+            //   form.reset();
+
+              
+            // }
+          });
         }
-        return error;
 
-    }
-
-    function formAddError(input){
-        input.parentElement.classList.add('_error');
-        input.classList.add('_error');
-    }
-    function formRemoveError(input){
-        input.parentElement.classList.remove('_error');
-        input.classList.remove('_error');
-    }
-    function emailTest (input) {
-        return !/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i.test(input.value);
-       
-    }
-    function numbTest (input) {
-        return !/^[\+380\.]+\d[\d\(\)\ -]{10,14}\d$/.test(input.value);
-       
-    }
-
-   
-    
+        validateForms('.form', { email: {required: true, email: true}, tel: {required: true} }, '.thanks-popup', 'send goal');
 
 
-});
